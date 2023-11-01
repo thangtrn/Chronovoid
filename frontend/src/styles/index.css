@@ -1,0 +1,83 @@
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+
+.f-center {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+.fy-center {
+   display: flex;
+   align-items: center;
+}
+.fx-center {
+   display: flex;
+   justify-content: center;
+}
+
+.logo {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   font-weight: bold;
+   font-size: 16px;
+   height: 64px;
+}
+
+.min-h-screen {
+   min-height: 100vh;
+}
+
+.btn-green:not(:disabled) {
+   background: rgb(24, 163, 24);
+}
+.btn-green:not(:disabled):hover {
+   background: rgb(24, 163, 24, 0.6) !important;
+}
+
+.table-wrapper {
+   margin-top: 16px;
+}
+
+.table-image {
+   width: 80px;
+   height: 80px;
+   object-fit: cover;
+}
+
+.modal-wrapper {
+   margin-top: 10px;
+}
+
+.modal-footer {
+   display: flex;
+   justify-content: flex-end;
+   margin-bottom: 0;
+}
+
+.icon-reset-rad-btn {
+   font-size: 1.7rem;
+   color: #1677ffe3;
+   cursor: pointer;
+   font-size: 16px;
+}
+
+.icon-reset-rad-btn:hover {
+   color: #0064f1e3;
+   opacity: 0.6;
+   transition: all 0.3s;
+   animation: resetButton 1s linear;
+}
+
+@keyframes resetButton {
+   from {
+      transform: rotate(0deg);
+   }
+
+   to {
+      transform: rotate(360deg);
+   }
+}
