@@ -27,13 +27,13 @@ const createProduct = async (req, res) => {
    try {
       const { name, price, quantity, description, image, categoryId } = req.body;
 
-      if (!name || !price || !quantity || !description || !categoryId) {
+      if (!name || !price || quantity < 0 || !description || !categoryId) {
          console.log(name, price, quantity, description, image, categoryId);
          return httpRes.Error('Vui lòng điền đầy đủ các trường', 400)
       }
 
       let _id = await generateUniqueId(Product, 'SP');
-      console.log(_id);
+
       const newProduct = new Product({ _id: _id, name, price, quantity, description, image, category: categoryId })
 
       await newProduct.save();

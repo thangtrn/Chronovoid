@@ -51,7 +51,7 @@ const productSchema = new Schema({
    },
    quantity: {
       type: Number,
-      required: true,
+      default: 0,
       min: 0,
    },
    description: String,
@@ -93,7 +93,7 @@ const orderItemSchema = new Schema({
    },
    quantity: Number,
    price: Number,
-   products: {
+   product: {
       type: String,
       ref: "Product"
    },
@@ -128,10 +128,31 @@ const orderSchema = new Schema({
    timestamps: true
 })
 
+const inventorySchema = new Schema({
+   _id: {
+      type: String,
+      required: true,
+      unique: true
+   },
+   quantity: {
+      type: Number,
+      min: 0,
+   },
+   totalPrice: Number,
+   product: {
+      type: String,
+      ref: "Product"
+   },
+}, {
+   _id: false,
+   timestamps: true
+})
+
 let User = mongoose.model("User", userSchema);
 let Product = mongoose.model("Product", productSchema);
 let Order = mongoose.model("Order", orderSchema);
-let OrderItem = mongoose.model("OrderItem", orderSchema);
+let OrderItem = mongoose.model("OrderItem", orderItemSchema);
 let Category = mongoose.model("Category", categorySchema);
+let Inventory = mongoose.model("Inventory", inventorySchema);
 
-module.exports = { User, Product, Order, Category, OrderItem };
+module.exports = { User, Product, Order, Category, OrderItem, Inventory };

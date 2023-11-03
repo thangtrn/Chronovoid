@@ -8,6 +8,7 @@ import CategoryPage from './pages/CategoryPage'
 import ProductPage from './pages/ProductPage'
 import OrderPage from './pages/OrderPage'
 import UserPage from './pages/UserPage'
+import InventoryPage from './pages/InventoryPage'
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path='/product' element={<ProductPage />} />
         <Route path='/order' element={<OrderPage />} />
         <Route path='/user' element={<UserPage />} />
+        <Route path='/inventory' element={<InventoryPage />} />
 
         <Route path='*' element={<NotFoundPage />} />
       </Route>

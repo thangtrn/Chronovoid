@@ -110,7 +110,7 @@ const CreateModal = ({ reload, onClose, data }) => {
                <Select
                   options={categoriesData.map(item => ({
                      value: item?._id,
-                     label: item?.name
+                     label: item?._id + ' - ' + item?.name
                   }))}
                />
             </Form.Item>
