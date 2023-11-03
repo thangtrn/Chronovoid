@@ -4,6 +4,7 @@ import axiosInstance from '../axios/axiosInstance'
 import {
    RedoOutlined
 } from '@ant-design/icons';
+import { formatDate, formatPrice } from '../utils/format';
 
 const InventoryPage = () => {
    const [form] = Form.useForm();
@@ -43,6 +44,7 @@ const InventoryPage = () => {
       {
          title: 'Giá',
          dataIndex: 'price',
+         render: (item) => formatPrice(item)
       },
       {
          title: 'Số lượng',
@@ -85,6 +87,12 @@ const InventoryPage = () => {
       {
          title: 'Tiền nhập hàng',
          dataIndex: 'totalPrice',
+         render: (item) => formatPrice(item)
+      },
+      {
+         title: 'Ngày nhập',
+         dataIndex: 'createdAt',
+         render: (item) => formatDate(item)
       },
    ]
 
@@ -264,6 +272,7 @@ const InventoryPage = () => {
                   <InputNumber
                      style={{ width: '100%' }}
                      readOnly
+                     addonAfter='đ'
                   />
                </Form.Item>
                <Form.Item>

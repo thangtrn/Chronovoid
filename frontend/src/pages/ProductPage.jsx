@@ -8,6 +8,7 @@ import {
    RedoOutlined
 } from '@ant-design/icons';
 import { EditModal, CreateModal } from '../components/Product';
+import { formatPrice } from '../utils/format';
 
 const ProductPage = () => {
    const [openModal, setOpenModal] = useState('')
@@ -42,6 +43,7 @@ const ProductPage = () => {
       {
          title: 'Giá',
          dataIndex: 'price',
+         render: (item) => formatPrice(item)
       },
       {
          title: 'Số lượng',
