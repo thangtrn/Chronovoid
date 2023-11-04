@@ -232,7 +232,7 @@ const InventoryPage = () => {
                ]}
                style={{
                   border: '1px solid #eee',
-                  padding: '10px',
+                  padding: '14px 10px',
                   borderRadius: '8px'
                }}
             >
@@ -275,16 +275,14 @@ const InventoryPage = () => {
                      addonAfter='đ'
                   />
                </Form.Item>
-               <Form.Item>
-                  <Button
-                     htmlType='submit'
-                     type='primary'
-                     style={{ width: '100%' }}
-                     disabled={dataSelectedProduct === null}
-                  >
-                     Nhập hàng
-                  </Button>
-               </Form.Item>
+               <Button
+                  htmlType='submit'
+                  type='primary'
+                  style={{ width: '100%' }}
+                  disabled={dataSelectedProduct === null}
+               >
+                  Nhập hàng
+               </Button>
             </Form>
          </div>
       </div>

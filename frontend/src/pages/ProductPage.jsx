@@ -126,7 +126,7 @@ const ProductPage = () => {
                   Sửa
                </Button>
 
-               <Popconfirm
+               {/* <Popconfirm
                   title="Xoá ?"
                   description="Bạn có chắc muốn xoá trường này?"
                   onConfirm={handleDeleteItem}
@@ -142,7 +142,7 @@ const ProductPage = () => {
                   >
                      Xoá
                   </Button>
-               </Popconfirm>
+               </Popconfirm> */}
             </Space>
 
             <Input.Search

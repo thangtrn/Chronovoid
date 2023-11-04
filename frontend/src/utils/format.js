@@ -19,7 +19,7 @@ export const formatPrice = (price) => {
 export const totalPrice = (arr = []) => {
    let total = 0;
    arr.forEach(value => {
-      total += value.count * value.price
+      total += value?.quantity * value?.price
    })
 
    return total

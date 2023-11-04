@@ -9,6 +9,7 @@ import ProductPage from './pages/ProductPage'
 import OrderPage from './pages/OrderPage'
 import UserPage from './pages/UserPage'
 import InventoryPage from './pages/InventoryPage'
+import PaymentPage from './pages/PaymentPage'
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path='/order' element={<OrderPage />} />
         <Route path='/user' element={<UserPage />} />
         <Route path='/inventory' element={<InventoryPage />} />
+        <Route path='/payment' element={<PaymentPage />} />
 
         <Route path='*' element={<NotFoundPage />} />
       </Route>

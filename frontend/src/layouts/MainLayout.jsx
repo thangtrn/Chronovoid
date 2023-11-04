@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
    MenuFoldOutlined,
    MenuUnfoldOutlined,
@@ -6,13 +6,17 @@ import {
    UserOutlined,
    DropboxOutlined,
    CreditCardOutlined,
-   PayCircleOutlined
+   PayCircleOutlined,
+   LoginOutlined
 } from '@ant-design/icons';
-import { Layout, Menu, Button, theme } from 'antd';
+import { Layout, Menu, Button, theme, Dropdown, message } from 'antd';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { AppContext } from '../context/AppProvider';
 const { Header, Sider, Content } = Layout;
 
 const MainLayout = () => {
+   const { auth, setAuth } = useContext(AppContext)
+
    const location = useLocation();
    const navigate = useNavigate();
    const [collapsed, setCollapsed] = useState(false);
@@ -23,6 +27,24 @@ const MainLayout = () => {
    const handleChangePage = ({ _, key }) => {
       navigate(key)
    }
+
+   useEffect(() => {
+      if (!auth) {
+         navigate('/login')
+      }
+   }, [auth, navigate])
+
+   const items = [
+      {
+         key: 'logout',
+         label: 'Đăng xuất',
+         icon: <LoginOutlined />,
+         onClick: () => {
+            setAuth(null)
+            message.success('Đăng xuất thành công');
+         }
+      },
+   ];
 
    return (
       <Layout>
@@ -76,7 +98,8 @@ const MainLayout = () => {
                         {
                            key: '/user',
                            label: 'Nhân viên',
-                           icon: <UserOutlined />
+                           icon: <UserOutlined />,
+                           disabled: auth?.role !== 'admin'
                         },
                      ]
                   },
@@ -89,6 +112,10 @@ const MainLayout = () => {
                style={{
                   padding: 0,
                   background: colorBgContainer,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingRight: '40px'
                }}
             >
                <Button
@@ -101,6 +128,13 @@ const MainLayout = () => {
                      height: 64,
                   }}
                />
+
+               <Dropdown menu={{ items }} placement="bottomRight" arrow={true} trigger={['click']}>
+                  <Button type='text'>
+                     <UserOutlined />
+                     <span style={{ marginLeft: 10 }}>{auth?.name}</span>
+                  </Button>
+               </Dropdown>
             </Header>
             <Content
                style={{

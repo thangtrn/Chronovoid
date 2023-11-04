@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Button, Input, Modal, Popconfirm, Space, Table, Tooltip, message } from 'antd'
 import { CreateModal, EditModal } from '../components/User';
 import axiosInstance from '../axios/axiosInstance'
@@ -8,8 +8,13 @@ import {
    EditOutlined,
    RedoOutlined
 } from '@ant-design/icons';
+import { AppContext } from '../context/AppProvider';
+import { useNavigate } from 'react-router-dom';
 
 const UserPage = () => {
+   const { auth, setAuth } = useContext(AppContext)
+   const navigate = useNavigate();
+
    const [openModal, setOpenModal] = useState('')
    const [data, setData] = useState([])
    const [dataSelected, setDataSelected] = useState(null)
@@ -100,6 +105,12 @@ const UserPage = () => {
       fetchTableData()
    }
 
+
+   useEffect(() => {
+      if (auth?.role !== 'admin') {
+         navigate('/')
+      }
+   }, [auth, navigate])
    return (
       <div>
          <Space style={{ display: 'flex', justifyContent: 'space-between' }}>

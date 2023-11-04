@@ -1,37 +1,66 @@
-import { Button, Space, Table } from 'antd'
-import React from 'react'
+import { Button, Input, Space, Table } from 'antd'
+import React, { useEffect, useState } from 'react'
+import axiosInstance from '../axios/axiosInstance'
+import { formatDate, formatPrice } from '../utils/format'
 
 const OrderPage = () => {
+   const [orders, setOrders] = useState([])
+   const [search, setSearch] = useState('')
 
-   const orders = []
+   const fetchDataTable = async () => {
+      try {
+         const res = await axiosInstance.get('/orders');
+
+         setOrders(res?.data?.metadata);
+      } catch (error) {
+         console.log(error);
+      }
+   }
+
+   useEffect(() => {
+      fetchDataTable();
+   }, [])
 
    const parentColumns = [
       {
          title: 'Mã hoá đơn',
-         dataIndex: 'id',
-         render: (text) => (
+         dataIndex: '_id',
+         render: (item) => (
             <div>
-               <span className='font-medium'>Mã hoá đơn:</span> {text}
+               <b>Mã hoá đơn:</b> {item}
+            </div>
+         ),
+         filteredValue: [search],
+         onFilter: (value, record) => {
+            return String(record?._id).toLowerCase().includes(value.toLowerCase());
+         },
+      },
+      {
+         title: 'Nhân viên',
+         dataIndex: 'staff',
+         render: (item) => (
+            <div>
+               <b>Nhân viên:</b> {item?._id} - {item?.name}
             </div>
          )
       },
       {
          title: 'Ngày hoá đơn',
-         dataIndex: 'createDate',
+         dataIndex: 'createdAt',
          render: (text) => (
             <div>
-               <span className='font-medium'>Ngày mua:</span>
-               {/* {formatDate(text)} */}
+               <b>Ngày mua: </b>
+               {formatDate(text)}
             </div>
          )
       },
       {
          title: 'Tổng tiền',
-         dataIndex: 'totalAmount',
-         render: (text) => (
+         dataIndex: 'totalPrice',
+         render: (item) => (
             <div>
-               <span className='font-medium'>Tổng tiền:</span>
-               {/* {formatPrice(text)} */}
+               <b>Tổng tiền: </b>
+               {formatPrice(item)}
             </div>
          )
       },
@@ -42,16 +71,10 @@ const OrderPage = () => {
          {
             title: 'Tên sản phẩm',
             dataIndex: 'product',
-            render: (_, record) => (
-               <div className='flex gap-[10px]'>
-                  <div className='w-16 h-16 flex-shrink-0'>
-                     <img
-                        className='w-full h-full object-cover'
-                        src={record?.productImage}
-                        alt=''
-                     />
-                  </div>
-                  <p className='text-truncate-2'>{record?.productName}</p>
+            render: (item, record) => (
+               <div className='fy-center'>
+                  <img className='table-image' src={item?.image} alt='' />
+                  <p className='text-truncate-2'>{item?.name}</p>
                </div>
             ),
             width: '40%'
@@ -59,7 +82,7 @@ const OrderPage = () => {
          {
             title: 'Đơn giá',
             dataIndex: 'price',
-            // render: (text) => formatPrice(text)
+            render: (item) => formatPrice(item)
          },
          {
             title: 'Số lượng',
@@ -67,14 +90,14 @@ const OrderPage = () => {
          },
          {
             title: 'Thành tiền',
-            // render: (_, record) => formatPrice(record?.quantity * record?.price)
+            render: (_, record) => formatPrice(record?.quantity * record?.price)
          },
       ];
 
       return (
          <Table
             columns={columns}
-            rowKey="productId"
+            rowKey="_id"
             dataSource={record.orderItems}
             pagination={false}
             size="small"
@@ -85,20 +108,30 @@ const OrderPage = () => {
    return (
       <div>
          <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2>Danh sách mua hàng</h2>
-            <button>1</button>
+            <h2>Hoá đơn mua hàng</h2>
+            <Input.Search
+               style={{
+                  width: "300px",
+               }}
+               onSearch={(value) => {
+                  console.log("---->", value);
+                  setSearch(value);
+               }}
+               allowClear
+               placeholder="Nhập mã hoá đơn"
+            />
          </Space>
          <div className='table-wrapper'>
             <Table
                size="small"
                pagination={false}
-               // showHeader={false}
+               showHeader={false}
                columns={parentColumns}
-               rowKey="id"
+               rowKey="_id"
                dataSource={orders}
                expandable={{
                   expandedRowRender,
-                  expandedRowKeys: orders.map(item => item?.id)
+                  expandedRowKeys: orders.map(item => item?._id)
                }}
             />
          </div>

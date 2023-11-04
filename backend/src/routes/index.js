@@ -8,7 +8,7 @@ const mainRoutes = (app) => {
     app.use('/api/auth', authRoute)
     app.use('/api/products', productRoute)
     app.use('/api/categories', categoryRoute)
-    app.use('/api/order', orderRoute)
+    app.use('/api/orders', orderRoute)
     app.use('/api/inventories', inventoryRoute)
 }
 
