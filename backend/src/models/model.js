@@ -57,7 +57,7 @@ const productSchema = new Schema({
    description: String,
    image: {
       type: String,
-      default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6R3wMlaQstAxcE5smAjdBTwHjgCquBVCiF-RmnIC9&s'
+      default: 'https://www.matx.com.au/images/default-image.jpg'
    },
    category: {
       type: String,

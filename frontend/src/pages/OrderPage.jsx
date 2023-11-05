@@ -1,4 +1,4 @@
-import { Button, Input, Space, Table } from 'antd'
+import { Button, DatePicker, Input, Space, Table } from 'antd'
 import React, { useEffect, useState } from 'react'
 import axiosInstance from '../axios/axiosInstance'
 import { formatDate, formatPrice } from '../utils/format'
@@ -6,6 +6,7 @@ import { formatDate, formatPrice } from '../utils/format'
 const OrderPage = () => {
    const [orders, setOrders] = useState([])
    const [search, setSearch] = useState('')
+   const [selectedDate, setSelectedDate] = useState(null);
 
    const fetchDataTable = async () => {
       try {
@@ -20,6 +21,10 @@ const OrderPage = () => {
    useEffect(() => {
       fetchDataTable();
    }, [])
+
+   const onChange = (date, dateString) => {
+      setSelectedDate(date);
+   };
 
    const parentColumns = [
       {
@@ -52,7 +57,16 @@ const OrderPage = () => {
                <b>Ngày mua: </b>
                {formatDate(text)}
             </div>
-         )
+         ),
+         filteredValue: [selectedDate],
+         onFilter: (value, record) => {
+            if (!selectedDate) return true; // Không có ngày được chọn, hiển thị tất cả
+            const d1 = new Date(value);
+            const d2 = new Date(record?.createdAt)
+
+            console.log(d1.getMonth(), d2.getMonth());
+            return d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
+         },
       },
       {
          title: 'Tổng tiền',
@@ -109,17 +123,20 @@ const OrderPage = () => {
       <div>
          <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2>Hoá đơn mua hàng</h2>
-            <Input.Search
-               style={{
-                  width: "300px",
-               }}
-               onSearch={(value) => {
-                  console.log("---->", value);
-                  setSearch(value);
-               }}
-               allowClear
-               placeholder="Nhập mã hoá đơn"
-            />
+            <div>
+               <DatePicker onChange={onChange} picker="month" style={{ marginRight: '10px' }} />
+               <Input.Search
+                  style={{
+                     width: "300px",
+                  }}
+                  onSearch={(value) => {
+                     console.log("---->", value);
+                     setSearch(value);
+                  }}
+                  allowClear
+                  placeholder="Nhập mã hoá đơn"
+               />
+            </div>
          </Space>
          <div className='table-wrapper'>
             <Table

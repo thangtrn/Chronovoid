@@ -5,7 +5,7 @@ import {
    LockOutlined
 } from '@ant-design/icons';
 import { AppContext } from '../context/AppProvider';
-import { useNavigate } from 'react-router-dom';
+import { json, useNavigate } from 'react-router-dom';
 import axiosInstance from '../axios/axiosInstance';
 
 const LoginPage = () => {
@@ -20,6 +20,9 @@ const LoginPage = () => {
          })
          console.log(res?.data?.metadata);
          setAuth(res?.data?.metadata);
+
+         localStorage.setItem('auth', JSON.stringify(res?.data?.metadata))
+
          navigate('/');
          message.success('Đăng nhập thành công')
       } catch (error) {

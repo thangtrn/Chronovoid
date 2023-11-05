@@ -13,7 +13,10 @@ const initialData = {
 }
 
 const AppProvider = ({ children }) => {
-   const [auth, setAuth] = useState(null);
+   const [auth, setAuth] = useState(() => {
+      return JSON.parse(localStorage.getItem('auth'));
+   });
+
    return (
       <AppContext.Provider value={{ auth, setAuth }}>
          {children}
