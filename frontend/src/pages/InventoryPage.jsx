@@ -1,155 +1,251 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Form, Input, InputNumber, Modal, Popconfirm, Space, Table, Tooltip, message } from 'antd'
-import axiosInstance from '../axios/axiosInstance'
+import React, { useContext, useEffect, useState } from "react";
 import {
-   RedoOutlined
-} from '@ant-design/icons';
-import { formatDate, formatPrice } from '../utils/format';
+   Button,
+   Form,
+   Input,
+   InputNumber,
+   Space,
+   Table,
+   Tooltip,
+   message,
+} from "antd";
+import axiosInstance from "../axios/axiosInstance";
+import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
+import { formatDate, formatPrice, totalPrice } from "../utils/format";
+import { AppContext } from "../context/AppProvider";
 
 const InventoryPage = () => {
+   const { auth } = useContext(AppContext);
+
    const [form] = Form.useForm();
-   const [dataProduct, setDataProduct] = useState([])
-   const [dataSelectedProduct, setDataSelectedProduct] = useState(null)
+   const [dataProduct, setDataProduct] = useState([]);
    const [searchProduct, setSearchProduct] = useState("");
 
-   const [dataInventory, setDataInventory] = useState([])
-   const [searchInventory, setSearchInventory] = useState("");
-
-   const [totalPrice, setTotalPrice] = useState(0)
-
+   const [dataCart, setDataCart] = useState([]);
 
    const columnsProduct = [
       {
-         title: 'Hình ảnh',
-         dataIndex: 'image',
-         width: '80px',
+         title: "Hình ảnh",
+         dataIndex: "image",
+         width: "80px",
          render: (text) => {
-            return (
-               <img className='table-image' src={text} alt='' />
-            )
-         }
-      },
-      {
-         title: 'Mã sản phẩm',
-         dataIndex: '_id',
-      },
-      {
-         title: 'Tên sản phẩm',
-         dataIndex: 'name',
-         filteredValue: [searchProduct],
-         onFilter: (value, record) => {
-            return String(record?.name).toLowerCase().includes(value.toLowerCase());
+            return <img className="table-image" src={text} alt="" />;
          },
       },
       {
-         title: 'Giá',
-         dataIndex: 'price',
-         render: (item) => formatPrice(item)
+         title: "Mã sản phẩm",
+         dataIndex: "_id",
+         filteredValue: [searchProduct],
+         onFilter: (value, record) => {
+            return String(record?._id)
+               .toLowerCase()
+               .includes(value.toLowerCase());
+         },
       },
       {
-         title: 'Số lượng',
-         dataIndex: 'quantity'
+         title: "Tên sản phẩm",
+         dataIndex: "name",
       },
       {
-         title: 'Danh mục',
-         dataIndex: 'category',
-         render: (item) => item?.name
+         title: "Giá",
+         dataIndex: "price",
+         render: (item) => formatPrice(item),
       },
       {
-         title: 'Mô tả',
-         dataIndex: 'description',
+         title: "Số lượng",
+         dataIndex: "quantity",
       },
-   ]
+      {
+         title: "Danh mục",
+         dataIndex: "category",
+         render: (item) => item?.name,
+      },
+      {
+         title: "",
+         render: (_, record) => {
+            let recordD = { ...record, totalProduct: record.quantity };
+            return (
+               <Tooltip title="Thêm">
+                  <Button
+                     icon={<PlusOutlined />}
+                     type="primary"
+                     size="small"
+                     onClick={() => handleAddCart(recordD)}
+                  />
+               </Tooltip>
+            );
+         },
+      },
+   ];
 
    const columnsInventory = [
       {
-         title: 'Mã phiếu nhập',
-         dataIndex: '_id',
-         filteredValue: [searchInventory],
-         onFilter: (value, record) => {
-            return String(record?._id).toLowerCase().includes(value.toLowerCase());
+         title: "Hình ảnh",
+         dataIndex: "image",
+         width: "80px",
+         render: (text) => {
+            return <img className="table-image" src={text} alt="" />;
          },
       },
       {
-         title: 'Mã sản phẩm',
-         dataIndex: 'product',
-         render: (item) => item?._id
+         title: "Mã sản phẩm",
+         dataIndex: "_id",
+         // filteredValue: [searchProduct],
+         // onFilter: (value, record) => {
+         //    return String(record?._id).toLowerCase().includes(value.toLowerCase());
+         // },
       },
       {
-         title: 'Tên sản phẩm',
-         dataIndex: 'product',
-         render: (item) => item?.name
+         title: "Tên sản phẩm",
+         dataIndex: "name",
       },
       {
-         title: 'Số lượng',
-         dataIndex: 'quantity'
+         title: "Giá",
+         dataIndex: "price",
+         render: (item) => formatPrice(item),
       },
       {
-         title: 'Tiền nhập hàng',
-         dataIndex: 'totalPrice',
-         render: (item) => formatPrice(item)
+         title: "Số lượng",
+         dataIndex: "quantity",
+         width: "160px",
+         render: (_, record) => {
+            return (
+               <>
+                  <Button
+                     icon={<MinusOutlined />}
+                     size="small"
+                     onClick={() => handleSetQuantity("minus", record)}
+                  />
+                  <InputNumber
+                     size="small"
+                     value={record?.quantity}
+                     min={1}
+                     readOnly
+                  />
+                  <Button
+                     icon={<PlusOutlined />}
+                     size="small"
+                     onClick={() => handleSetQuantity("plus", record)}
+                  />
+               </>
+            );
+         },
       },
       {
-         title: 'Ngày nhập',
-         dataIndex: 'createdAt',
-         render: (item) => formatDate(item)
+         title: "Danh mục",
+         dataIndex: "category",
+         render: (item) => item?.name,
       },
-   ]
+      {
+         title: "",
+         render: (_, record) => {
+            return (
+               <Tooltip title="Xoá">
+                  <Button
+                     icon={<DeleteOutlined />}
+                     danger
+                     type="primary"
+                     size="small"
+                     onClick={() => handleRemoveItemCart(record)}
+                  />
+               </Tooltip>
+            );
+         },
+      },
+   ];
 
-   const fetchTableDataProduct = async () => {
-      try {
-         const res = await axiosInstance.get('/products')
-         setDataProduct(res?.data?.metadata)
-      } catch (error) {
-         console.log(error);
+   const handleAddCart = (record) => {
+      // if (record.quantity <= 0) {
+      //    return message.warning("Sản phẩm đã hết hàng");
+      // }
+      const index = dataCart.findIndex((item) => item._id === record._id);
+      if (index < 0) {
+         record.quantity = 1;
+         setDataCart([...dataCart, record]);
+      } else {
+         // if (record.quantity <= dataCart[index].quantity) {
+         //    return message.warning("Hàng trong kho không đủ");
+         // }
+
+         dataCart[index].quantity += 1;
+         const newDataCart = dataCart.map((item, idx) => {
+            if (idx === item) return (item.quantity += 1);
+            else return item;
+         });
+
+         setDataCart(newDataCart);
       }
-   }
-
-   const fetchTableDataInventory = async () => {
-      try {
-         const res = await axiosInstance.get('/inventories')
-         setDataInventory(res?.data?.metadata)
-      } catch (error) {
-         console.log(error);
-      }
-   }
-
-   useEffect(() => {
-      fetchTableDataProduct()
-      fetchTableDataInventory()
-   }, [])
-
-   const handleUncheckRadioProduct = () => {
-      setDataSelectedProduct(null)
-      fetchTableDataProduct()
-      message.success('Làm mới thành công')
-      form.resetFields();
-      setTotalPrice(0)
    };
 
-   const handleSubmitInventory = async ({ _id, quantity, totalPrice }) => {
+   const handleRemoveItemCart = (record) => {
+      console.log(record);
+      const newData = dataCart.filter((item) => item._id !== record._id);
+      setDataCart(newData);
+   };
+
+   const handleSetQuantity = (type, record) => {
+      let newDataCart;
+      if (type === "minus") {
+         if (record.quantity <= 1) return;
+         newDataCart = dataCart.map((item) => {
+            if (item._id === record._id) item.quantity -= 1;
+            return item;
+         });
+      } else {
+         // if (record.quantity >= record?.totalProduct) return;
+         newDataCart = dataCart.map((item) => {
+            if (item._id === record._id) item.quantity += 1;
+            return item;
+         });
+      }
+      setDataCart(newDataCart);
+   };
+
+   // LOAD DATA
+   const fetchTableDataProduct = async () => {
       try {
-         await axiosInstance.post('/inventories', {
-            productId: _id,
-            totalPrice,
-            quantity
-         })
-         fetchTableDataProduct()
-         fetchTableDataInventory()
-         form.resetFields();
-         setTotalPrice(0)
-         setDataSelectedProduct(null)
-         message.success('Tạo phiếu nhập thành công')
+         const res = await axiosInstance.get("/products");
+         setDataProduct(res?.data?.metadata);
       } catch (error) {
          console.log(error);
-         message.error('Đã có lỗi')
       }
-   }
+   };
+
+   useEffect(() => {
+      fetchTableDataProduct();
+   }, []);
+
+   const handleSubmitOrder = async () => {
+      try {
+         let products = [];
+         dataCart.forEach((item) => {
+            products.push({
+               productId: item?._id,
+               quantity: item?.quantity,
+               price: item?.price,
+            });
+         });
+
+         console.log(products);
+
+         await axiosInstance.post("/inventories", {
+            totalPrice: totalPrice(dataCart),
+            userId: auth?._id,
+            products: products,
+         });
+         fetchTableDataProduct();
+         setDataCart([]);
+         message.success("Tạo phiếu nhập thành công");
+      } catch (error) {
+         console.log(error);
+         message.error("Đã có lỗi");
+      }
+   };
 
    return (
-      <div className='inventory-wrapper'>
-         <div className='inventory-left'>
-            <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div className="inventory-wrapper">
+         <div className="inventory-left">
+            <Space style={{ display: "flex", justifyContent: "space-between" }}>
                <h3>Sản phẩm</h3>
                <Input.Search
                   style={{
@@ -160,133 +256,91 @@ const InventoryPage = () => {
                      setSearchProduct(value);
                   }}
                   allowClear
-                  placeholder="Tên sản phẩm"
+                  placeholder="Nhập mã sản phẩm"
                />
             </Space>
 
-            <div className='table-wrapper'>
+            <div className="table-wrapper">
                <Table
-                  pagination={{ pageSize: 5 }}
-                  size='small'
-                  rowKey='_id'
+                  size="small"
+                  rowKey="_id"
                   scroll={{ x: 800 }}
                   columns={columnsProduct}
                   dataSource={dataProduct}
-                  rowSelection={{
-                     type: 'radio',
-                     columnTitle: () => {
-                        return (
-                           <Tooltip title="Làm mới">
-                              <RedoOutlined
-                                 className="icon-reset-rad-btn"
-                                 onClick={handleUncheckRadioProduct}
-                              />
-                           </Tooltip>
-                        );
-                     },
-                     onChange: (_, selectedRows) => {
-                        setDataSelectedProduct(selectedRows[0]);
-                     },
-                     selectedRowKeys: dataSelectedProduct ? [dataSelectedProduct._id] : [],
-                  }}
                />
             </div>
 
-            <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
-               <h3>Phiếu nhập hàng</h3>
-               <Input.Search
-                  style={{
-                     width: "300px",
-                  }}
-                  onSearch={(value) => {
-                     console.log("---->", value);
-                     setSearchInventory(value);
-                  }}
-                  allowClear
-                  placeholder="Tên phiếu nhập"
-               />
+            <Space style={{ display: "flex", justifyContent: "space-between" }}>
+               <h3>Sản phẩm cần nhập</h3>
             </Space>
 
-            <div className='table-wrapper'>
+            <div className="table-wrapper">
                <Table
-                  pagination={{ pageSize: 5 }}
-                  size='small'
-                  rowKey='_id'
+                  size="small"
+                  rowKey="_id"
                   scroll={{ x: 800 }}
                   columns={columnsInventory}
-                  dataSource={dataInventory}
+                  dataSource={dataCart}
                />
             </div>
          </div>
 
-         <div className='inventory-right'>
-            <h2>Nhập hàng</h2>
+         <div className="inventory-right">
+            <h2>Hoá đơn mua hàng</h2>
             <Form
                form={form}
-               onFinish={handleSubmitInventory}
-               layout='vertical'
-               fields={[
-                  { name: '_id', value: dataSelectedProduct?._id },
-                  { name: 'name', value: dataSelectedProduct?.name },
-                  { name: 'totalPrice', value: totalPrice },
-               ]}
+               onFinish={handleSubmitOrder}
+               layout="vertical"
                style={{
-                  border: '1px solid #eee',
-                  padding: '14px 10px',
-                  borderRadius: '8px'
+                  border: "1px solid #eee",
+                  padding: "14px 10px",
+                  borderRadius: "8px",
                }}
             >
-               <Form.Item label='Mã sản phẩm' name='_id'>
-                  <Input readOnly />
-               </Form.Item>
-               <Form.Item label='Tên sản phẩm sản phẩm' name='name'>
-                  <Input readOnly />
-               </Form.Item>
-               <Form.Item
-                  label='Số lượng'
-                  name='quantity'
-                  rules={[
-                     {
-                        required: true,
-                        message: 'Vui lòng nhập số lượng',
-                     },
-                  ]}
+               <Space
+                  style={{
+                     display: "flex",
+                     justifyContent: "space-between",
+                     marginBottom: "20px",
+                  }}
                >
-                  <InputNumber
-                     style={{ width: '100%' }}
-                     onChange={(value) => setTotalPrice(value * dataSelectedProduct?.price)}
-                     readOnly={dataSelectedProduct === null}
-                     min={1}
-                  />
-               </Form.Item>
-               <Form.Item
-                  label='Tổng tiền'
-                  name='totalPrice'
-                  rules={[
-                     {
-                        required: true,
-                        message: 'Vui lòng nhập tên danh mục',
-                     },
-                  ]}
+                  <h3>Nhân viên</h3>
+                  <span>
+                     {auth?._id} - {auth?.name}
+                  </span>
+               </Space>
+               <Space
+                  style={{
+                     display: "flex",
+                     justifyContent: "space-between",
+                     marginBottom: "20px",
+                  }}
                >
-                  <InputNumber
-                     style={{ width: '100%' }}
-                     readOnly
-                     addonAfter='đ'
-                  />
-               </Form.Item>
+                  <h3>Ngày tạo phiếu</h3>
+                  <span>{formatDate(new Date())}</span>
+               </Space>
+               <Space
+                  style={{
+                     display: "flex",
+                     justifyContent: "space-between",
+                     marginBottom: "20px",
+                  }}
+               >
+                  <h3>Tổng tiền</h3>
+                  <b>{formatPrice(totalPrice(dataCart))}</b>
+               </Space>
                <Button
-                  htmlType='submit'
-                  type='primary'
-                  style={{ width: '100%' }}
-                  disabled={dataSelectedProduct === null}
+                  htmlType="submit"
+                  type="primary"
+                  style={{ width: "100%" }}
+                  disabled={dataCart.length <= 0}
                >
-                  Nhập hàng
+                  Tạo phiếu nhập
                </Button>
             </Form>
          </div>
       </div>
-   )
-}
+   );
+};
 
-export default InventoryPage
+export default InventoryPage;

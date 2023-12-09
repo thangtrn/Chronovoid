@@ -8,6 +8,7 @@ import {
    CreditCardOutlined,
    PayCircleOutlined,
    LoginOutlined,
+   BarChartOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Button, theme, Dropdown, message } from "antd";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -114,6 +115,11 @@ const MainLayout = () => {
                      label: "Nhân viên",
                      icon: <UserOutlined />,
                      disabled: auth?.role !== "admin",
+                  },
+                  {
+                     key: "/statistic",
+                     label: "Thống kê",
+                     icon: <BarChartOutlined />,
                   },
                ]}
             />

@@ -52,16 +52,19 @@ const ProductPage = () => {
       {
          title: "Giá",
          dataIndex: "price",
+         width: "120px",
          render: (item) => formatPrice(item),
       },
       {
          title: "Số lượng",
          dataIndex: "quantity",
+         width: "100px",
       },
       {
          title: "Danh mục",
          dataIndex: "category",
          render: (item) => item?.name,
+         width: "160px",
       },
       {
          title: "Mô tả",

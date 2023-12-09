@@ -11,6 +11,7 @@ import UserPage from "./pages/UserPage";
 import InventoryPage from "./pages/InventoryPage";
 import PaymentPage from "./pages/PaymentPage";
 import InventoryDetailPage from "./pages/InventoryDetailPage";
+import StatisticsPage from "./pages/StatisticsPage";
 
 const App = () => {
    return (
@@ -25,6 +26,7 @@ const App = () => {
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/inventory-detail" element={<InventoryDetailPage />} />
             <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/statistic" element={<StatisticsPage />} />
 
             <Route path="*" element={<NotFoundPage />} />
          </Route>
