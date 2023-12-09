@@ -1,41 +1,64 @@
-const { Product, Inventory } = require('../models/model');
-const HttpResponse = require('../utils/httpResponse');
-const generateUniqueId = require('../utils/generateUniqueId')
+const { Product, Inventory, InventoryItem } = require("../models/model");
+const HttpResponse = require("../utils/httpResponse");
+const generateUniqueId = require("../utils/generateUniqueId");
 
 const getAllInventory = async (req, res) => {
-   const httpRes = new HttpResponse(res)
+   const httpRes = new HttpResponse(res);
    try {
-      const inventories = await Inventory.find({}).populate(['product']).sort('-createdAt')
-      return httpRes.Ok(inventories);
+      const inventories = await Inventory.find()
+         .populate({
+            path: "staff",
+            select: "-password",
+         })
+         .populate({
+            path: "inventoryItems",
+            populate: {
+               path: "product",
+            },
+         })
+         .sort("-createdAt");
+      httpRes.Ok(inventories);
    } catch (error) {
-      httpRes.Error(error.message)
+      httpRes.Error(error.message);
    }
-}
+};
 
 const createInventory = async (req, res) => {
-   const httpRes = new HttpResponse(res)
+   const httpRes = new HttpResponse(res);
    try {
-      const { productId, quantity, totalPrice } = req.body;
+      const { totalPrice, userId = "US001", products = [] } = req.body;
 
-      if (!productId || quantity < 0 || totalPrice < 0) {
-         return httpRes.Error('Vui lòng điền đầy đủ các trường', 400)
+      // 1. Tạo một hóa đơn mới
+      const newInventory = new Inventory({
+         _id: await generateUniqueId(Inventory, "PH"),
+         totalPrice,
+         staff: userId,
+      });
+
+      // 2. Tạo các mục hóa đơn và liên kết chúng với hóa đơn
+      const inventoryItems = [];
+      for (const product of products) {
+         const { productId, quantity, price } = product;
+         const inventoryItem = new InventoryItem({
+            _id: await generateUniqueId(InventoryItem, "PHT"),
+            quantity,
+            price,
+            product: productId,
+         });
+         await inventoryItem.save();
+         await Product.findByIdAndUpdate(productId, {
+            $inc: { quantity: +quantity },
+         });
+         inventoryItems.push(inventoryItem._id);
       }
+      newInventory.inventoryItems = inventoryItems;
 
-      let _id = await generateUniqueId(Inventory, 'PN');
-
-      await Product.findOneAndUpdate({ _id: productId }, {
-         $inc: { quantity: quantity }
-      })
-
-      const newInventory = await Inventory({ _id: _id, quantity, totalPrice, product: productId })
-
+      // 3. Cập nhật tổng giá trị của hóa đơn
       await newInventory.save();
-
-      return httpRes.Ok(newInventory, 'Tạo thành công');
+      httpRes.Ok(null, "Tạo phiếu nhập thành công");
    } catch (error) {
-      httpRes.Error(error.message)
+      httpRes.Error(error.message);
    }
-}
+};
 
-
-module.exports = { getAllInventory, createInventory }
+module.exports = { getAllInventory, createInventory };
