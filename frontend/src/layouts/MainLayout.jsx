@@ -9,6 +9,8 @@ import {
    PayCircleOutlined,
    LoginOutlined,
    BarChartOutlined,
+   HomeOutlined,
+   ProfileOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Button, theme, Dropdown, message } from "antd";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -67,6 +69,11 @@ const MainLayout = () => {
                defaultOpenKeys={["1", "2"]}
                items={[
                   {
+                     key: "/",
+                     label: "Dashboard",
+                     icon: <HomeOutlined />,
+                  },
+                  {
                      key: "1",
                      label: "Mua bán",
                      icon: <PayCircleOutlined />,
@@ -91,17 +98,17 @@ const MainLayout = () => {
                   {
                      key: "2",
                      label: "Nhập hàng",
-                     icon: <CreditCardOutlined />,
+                     icon: <ProfileOutlined />,
                      children: [
                         {
                            key: "/inventory",
                            label: "Nhập hàng",
-                           icon: <CreditCardOutlined />,
+                           icon: <ProfileOutlined />,
                         },
                         {
                            key: "/inventory-detail",
                            label: "Phiếu nhập hàng",
-                           icon: <CreditCardOutlined />,
+                           icon: <ProfileOutlined />,
                         },
                      ],
                   },
@@ -166,7 +173,7 @@ const MainLayout = () => {
                   margin: "10px",
                   padding: 12,
                   border: "6px",
-                  background: colorBgContainer,
+                  // background: colorBgContainer,
                }}
             >
                <Outlet />

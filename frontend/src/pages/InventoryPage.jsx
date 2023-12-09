@@ -271,7 +271,7 @@ const InventoryPage = () => {
             </div>
 
             <Space style={{ display: "flex", justifyContent: "space-between" }}>
-               <h3>Sản phẩm cần nhập</h3>
+               <h3>Danh sách sản phẩm nhập</h3>
             </Space>
 
             <div className="table-wrapper">
@@ -286,7 +286,7 @@ const InventoryPage = () => {
          </div>
 
          <div className="inventory-right">
-            <h2>Hoá đơn mua hàng</h2>
+            <h2>Phiếu nhập hàng</h2>
             <Form
                form={form}
                onFinish={handleSubmitOrder}
@@ -295,6 +295,7 @@ const InventoryPage = () => {
                   border: "1px solid #eee",
                   padding: "14px 10px",
                   borderRadius: "8px",
+                  backgroundColor: "#ffff",
                }}
             >
                <Space

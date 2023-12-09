@@ -295,6 +295,7 @@ const PaymentPage = () => {
                   border: "1px solid #eee",
                   padding: "14px 10px",
                   borderRadius: "8px",
+                  backgroundColor: "#ffff",
                }}
             >
                <Space
