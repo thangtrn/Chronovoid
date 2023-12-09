@@ -1,117 +1,125 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Input, Modal, Popconfirm, Space, Table, Tooltip, message } from 'antd'
-import axiosInstance from '../axios/axiosInstance'
+import React, { useEffect, useState } from "react";
+import {
+   Button,
+   Input,
+   Modal,
+   Popconfirm,
+   Space,
+   Table,
+   Tooltip,
+   message,
+} from "antd";
+import axiosInstance from "../axios/axiosInstance";
 import {
    PlusCircleOutlined,
    DeleteOutlined,
    EditOutlined,
-   RedoOutlined
-} from '@ant-design/icons';
-import { EditModal, CreateModal } from '../components/Product';
-import { formatPrice } from '../utils/format';
+   RedoOutlined,
+} from "@ant-design/icons";
+import { EditModal, CreateModal } from "../components/Product";
+import { formatPrice } from "../utils/format";
 
 const ProductPage = () => {
-   const [openModal, setOpenModal] = useState('')
-   const [data, setData] = useState([])
-   const [dataSelected, setDataSelected] = useState(null)
+   const [openModal, setOpenModal] = useState("");
+   const [data, setData] = useState([]);
+   const [dataSelected, setDataSelected] = useState(null);
 
    const [search, setSearch] = useState("");
 
    const columns = [
       {
-         title: 'Hình ảnh',
-         dataIndex: 'image',
-         width: '80px',
+         title: "Hình ảnh",
+         dataIndex: "image",
+         width: "80px",
          render: (text) => {
-            return (
-               <img className='table-image' src={text} alt='' />
-            )
-         }
-      },
-      {
-         title: 'Mã sản phẩm',
-         dataIndex: '_id',
-      },
-      {
-         title: 'Tên sản phẩm',
-         dataIndex: 'name',
-         filteredValue: [search],
-         onFilter: (value, record) => {
-            return String(record?.name).toLowerCase().includes(value.toLowerCase());
+            return <img className="table-image" src={text} alt="" />;
          },
       },
       {
-         title: 'Giá',
-         dataIndex: 'price',
-         render: (item) => formatPrice(item)
+         title: "Mã sản phẩm",
+         dataIndex: "_id",
       },
       {
-         title: 'Số lượng',
-         dataIndex: 'quantity'
+         title: "Tên sản phẩm",
+         dataIndex: "name",
+         filteredValue: [search],
+         onFilter: (value, record) => {
+            return String(record?.name)
+               .toLowerCase()
+               .includes(value.toLowerCase());
+         },
       },
       {
-         title: 'Danh mục',
-         dataIndex: 'category',
-         render: (item) => item?.name
+         title: "Giá",
+         dataIndex: "price",
+         render: (item) => formatPrice(item),
       },
       {
-         title: 'Mô tả',
-         dataIndex: 'description',
+         title: "Số lượng",
+         dataIndex: "quantity",
       },
-   ]
+      {
+         title: "Danh mục",
+         dataIndex: "category",
+         render: (item) => item?.name,
+      },
+      {
+         title: "Mô tả",
+         dataIndex: "description",
+      },
+   ];
 
    const fetchTableData = async () => {
       try {
-         const res = await axiosInstance.get('/products')
-         setData(res?.data?.metadata)
+         const res = await axiosInstance.get("/products");
+         setData(res?.data?.metadata);
       } catch (error) {
          console.log(error);
       }
-   }
+   };
 
    useEffect(() => {
-      fetchTableData()
-   }, [])
+      fetchTableData();
+   }, []);
 
    const handleOpenModal = (key) => {
-      setOpenModal(key)
-   }
+      setOpenModal(key);
+   };
 
    const handleCloseModal = () => {
-      setOpenModal('')
-   }
+      setOpenModal("");
+   };
 
    const handleDeleteItem = async () => {
       try {
          await axiosInstance.delete(`/products/${dataSelected._id}`);
-         message.success('Xoá thành công')
-         reload()
+         message.success("Xoá thành công");
+         reload();
       } catch (error) {
          console.log(error);
-         message.error(error?.response?.data?.message)
+         message.error(error?.response?.data?.message);
       }
-   }
+   };
 
    const handleUncheckRadio = () => {
-      setDataSelected(null)
-      fetchTableData()
-      message.success('Làm mới thành công')
+      setDataSelected(null);
+      fetchTableData();
+      message.success("Làm mới thành công");
    };
 
    const reload = () => {
-      setDataSelected(null)
-      fetchTableData()
-   }
-
+      setDataSelected(null);
+      fetchTableData();
+   };
 
    return (
       <div>
-         <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+         <Space style={{ display: "flex", justifyContent: "space-between" }}>
             <Space>
                <Button
                   type="primary"
                   icon={<PlusCircleOutlined />}
-                  onClick={() => handleOpenModal('add')}
+                  onClick={() => handleOpenModal("add")}
                >
                   Thêm
                </Button>
@@ -119,14 +127,14 @@ const ProductPage = () => {
                <Button
                   type="primary"
                   icon={<EditOutlined />}
-                  className='btn-green'
-                  onClick={() => handleOpenModal('edit')}
+                  className="btn-green"
+                  onClick={() => handleOpenModal("edit")}
                   disabled={!dataSelected}
                >
                   Sửa
                </Button>
 
-               {/* <Popconfirm
+               <Popconfirm
                   title="Xoá ?"
                   description="Bạn có chắc muốn xoá trường này?"
                   onConfirm={handleDeleteItem}
@@ -142,7 +150,7 @@ const ProductPage = () => {
                   >
                      Xoá
                   </Button>
-               </Popconfirm> */}
+               </Popconfirm>
             </Space>
 
             <Input.Search
@@ -158,16 +166,16 @@ const ProductPage = () => {
             />
          </Space>
 
-         <div className='table-wrapper'>
+         <div className="table-wrapper">
             <Table
                pagination={{ pageSize: 5 }}
-               size='small'
-               rowKey='_id'
+               size="small"
+               rowKey="_id"
                scroll={{ x: 800 }}
                columns={columns}
                dataSource={data}
                rowSelection={{
-                  type: 'radio',
+                  type: "radio",
                   columnTitle: () => {
                      return (
                         <Tooltip title="Làm mới">
@@ -187,7 +195,7 @@ const ProductPage = () => {
          </div>
 
          <Modal
-            open={openModal === 'add'}
+            open={openModal === "add"}
             onCancel={handleCloseModal}
             width={700}
             centered={true}
@@ -200,7 +208,7 @@ const ProductPage = () => {
          </Modal>
 
          <Modal
-            open={openModal === 'edit'}
+            open={openModal === "edit"}
             onCancel={handleCloseModal}
             width={700}
             centered={true}
@@ -209,10 +217,14 @@ const ProductPage = () => {
             destroyOnClose
          >
             <h2>Sửa sản phẩm</h2>
-            <EditModal reload={reload} onClose={handleCloseModal} data={dataSelected} />
+            <EditModal
+               reload={reload}
+               onClose={handleCloseModal}
+               data={dataSelected}
+            />
          </Modal>
       </div>
-   )
-}
+   );
+};
 
-export default ProductPage
+export default ProductPage;
