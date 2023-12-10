@@ -89,11 +89,13 @@ const MainLayout = () => {
                      key: "/category",
                      label: "Thể loại",
                      icon: <OrderedListOutlined />,
+                     disabled: auth?.role !== "admin",
                   },
                   {
                      key: "/product",
                      label: "Sản phẩm",
                      icon: <DropboxOutlined />,
+                     disabled: auth?.role !== "admin",
                   },
                   {
                      key: "2",
@@ -104,11 +106,13 @@ const MainLayout = () => {
                            key: "/inventory",
                            label: "Nhập hàng",
                            icon: <ProfileOutlined />,
+                           disabled: auth?.role !== "admin",
                         },
                         {
                            key: "/inventory-detail",
                            label: "Phiếu nhập hàng",
                            icon: <ProfileOutlined />,
+                           disabled: auth?.role !== "admin",
                         },
                      ],
                   },
@@ -116,6 +120,7 @@ const MainLayout = () => {
                      key: "/order",
                      label: "Hoá đơn",
                      icon: <CreditCardOutlined />,
+                     disabled: auth?.role !== "admin",
                   },
                   {
                      key: "/user",
@@ -127,6 +132,7 @@ const MainLayout = () => {
                      key: "/statistic",
                      label: "Thống kê",
                      icon: <BarChartOutlined />,
+                     disabled: auth?.role !== "admin",
                   },
                ]}
             />
