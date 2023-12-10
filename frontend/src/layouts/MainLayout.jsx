@@ -44,6 +44,7 @@ const MainLayout = () => {
          icon: <LoginOutlined />,
          onClick: () => {
             setAuth(null);
+            localStorage.removeItem("auth");
             message.success("Đăng xuất thành công");
          },
       },
