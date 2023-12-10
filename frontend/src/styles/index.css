@@ -121,3 +121,8 @@
    background-color: white;
    padding: 8px;
 }
+
+.statistic-date {
+   margin-bottom: 16px;
+   border-radius: 4px;
+}

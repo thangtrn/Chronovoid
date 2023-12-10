@@ -1,102 +1,90 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Col, Row } from "antd";
-import {
-   ShoppingCartOutlined,
-   DollarOutlined,
-   OrderedListOutlined,
-} from "@ant-design/icons";
+import axiosInstance from "../axios/axiosInstance";
+
+import { ShoppingCartOutlined } from "@ant-design/icons";
 import DashboardCard from "../components/Dashboard/DashboardCard";
 import { BarChart, LineChart } from "../components/Chart";
-
-const Data = [
-   {
-      id: 1,
-      year: 2016,
-      userGain: 80000,
-      userLost: 823,
-   },
-   {
-      id: 2,
-      year: 2017,
-      userGain: 45677,
-      userLost: 345,
-   },
-   {
-      id: 3,
-      year: 2018,
-      userGain: 78888,
-      userLost: 555,
-   },
-   {
-      id: 4,
-      year: 2019,
-      userGain: 90000,
-      userLost: 4555,
-   },
-   {
-      id: 5,
-      year: 2020,
-      userGain: 4300,
-      userLost: 234,
-   },
-];
+import moment from "moment";
 
 const DashboardPage = () => {
+   // chart Data
    const [chartData, setChartData] = useState({
-      labels: Data.map((data) => data.year),
-      datasets: [
-         {
-            label: "Users Gained ",
-            data: Data.map((data) => data.userGain),
-         },
-      ],
+      labels: [],
+      datasets: [],
    });
+   const fetchChart = async () => {
+      try {
+         // Lấy ngày đầu tuần (thường là thứ 2)
+         const startOfWeek = moment().clone().startOf("isoWeek");
+
+         // Lấy ngày cuối tuần (thường là Chủ Nhật)
+         const endOfWeek = moment().clone().endOf("isoWeek");
+
+         const res = await axiosInstance.get("/statistic/revenue", {
+            params: {
+               fromDate: startOfWeek,
+               toDate: endOfWeek,
+            },
+         });
+
+         const data = res?.data?.metadata || [];
+         setChartData({
+            labels: data.map((item) => item?.date),
+            datasets: [
+               {
+                  label: "Doanh thu",
+                  data: data.map((item) => item?.totalPrice),
+               },
+            ],
+         });
+      } catch (error) {
+         console.log(error);
+      }
+   };
+   useEffect(() => {
+      fetchChart();
+   }, []);
+
+   // data
+   const [data, setData] = useState([]);
+   const fetchDashboard = async () => {
+      try {
+         const res = await axiosInstance.get("/statistic/dashboard");
+         setData(res?.data?.metadata);
+      } catch (error) {
+         console.log(error);
+      }
+   };
+   useEffect(() => {
+      fetchDashboard();
+   }, []);
 
    return (
       <div>
          <Row gutter={[16, 16]}>
-            <DashboardCard
-               title="Đơn hàng trong ngày"
-               value={11}
-               prefix={
-                  <ShoppingCartOutlined
-                     size={24}
-                     style={{ marginRight: "18px" }}
-                  />
-               }
-            />
-            <DashboardCard
-               title="Doanh thu trong ngày"
-               value={11}
-               prefix={
-                  <DollarOutlined size={24} style={{ marginRight: "18px" }} />
-               }
-            />
-            <DashboardCard
-               title="Phiếu nhập trong ngày"
-               value={11}
-               prefix={
-                  <OrderedListOutlined
-                     size={24}
-                     style={{ marginRight: "18px" }}
-                  />
-               }
-            />
-            <DashboardCard
-               title="Tiền hàng trong ngày"
-               value={11}
-               prefix={
-                  <DollarOutlined size={24} style={{ marginRight: "18px" }} />
-               }
-            />
+            {data?.map((item, index) => (
+               <DashboardCard
+                  key={index}
+                  title={item?.title}
+                  value={item?.value}
+                  prefix={
+                     <ShoppingCartOutlined
+                        size={24}
+                        style={{ marginRight: "18px" }}
+                     />
+                  }
+                  suffix={item?.suffix}
+               />
+            ))}
          </Row>
 
          <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
             <Col span={12}>
-               <BarChart data={chartData} />
+               <BarChart data={chartData} title="Doanh thu trong tuần" />
             </Col>
             <Col span={12}>
-               <LineChart />
+               <LineChart title="Đơn bán hàng trong tuần" />
             </Col>
          </Row>
       </div>
